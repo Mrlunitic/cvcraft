@@ -15,8 +15,19 @@ export default function Register() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    const hasNumber = /\d/;
+    const hasSpecialChar = /[@#!$%^&*()_+|~=`{}\[\]:";'<>?,.\/]/;
+
     if (password.length < 8) {
-      setError('Password must be at least 8 characters.');
+      setError('Password must be at least 8 characters long.');
+      return;
+    }
+    if (!hasNumber.test(password)) {
+      setError('Password must contain at least one number.');
+      return;
+    }
+    if (!hasSpecialChar.test(password)) {
+      setError('Password must contain at least one special character (@, #, !, etc).');
       return;
     }
     setLoading(true);
