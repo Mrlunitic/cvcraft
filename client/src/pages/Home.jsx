@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import api from '../api/axios';
 import './Home.css';
 
 const stats = [
@@ -52,6 +54,30 @@ const testimonials = [
 ];
 
 export default function Home() {
+  const [feedback, setFeedback] = useState({ name: '', message: '', rating: 0 });
+  const [hoverRating, setHoverRating] = useState(0);
+  const [submitState, setSubmitState] = useState('idle'); // idle | loading | success | error
+  const [submitMsg, setSubmitMsg] = useState('');
+
+  const handleFeedbackSubmit = async (e) => {
+    e.preventDefault();
+    if (feedback.rating === 0) {
+      setSubmitState('error');
+      setSubmitMsg('Please select a star rating.');
+      return;
+    }
+    setSubmitState('loading');
+    try {
+      await api.post('/feedback', feedback);
+      setSubmitState('success');
+      setSubmitMsg('Thank you for your feedback! 🎉');
+      setFeedback({ name: '', message: '', rating: 0 });
+    } catch {
+      setSubmitState('error');
+      setSubmitMsg('Something went wrong. Please try again.');
+    }
+  };
+
   return (
     <div className="home-container">
 
@@ -166,6 +192,81 @@ export default function Home() {
               </div>
             </div>
           ))}
+        </div>
+      </section>
+      {/* ── Feedback ── */}
+      <section className="feedback-section">
+        <div className="section-header">
+          <h2>Share Your Experience</h2>
+          <p>We'd love to hear what you think about CVCraft. Your feedback helps us improve!</p>
+        </div>
+        <div className="feedback-card">
+          {submitState === 'success' ? (
+            <div className="feedback-success">
+              <div className="feedback-success-icon">🎉</div>
+              <h3>Thank you!</h3>
+              <p>{submitMsg}</p>
+              <button className="btn btn-primary" onClick={() => setSubmitState('idle')}>Submit Another</button>
+            </div>
+          ) : (
+            <form className="feedback-form" onSubmit={handleFeedbackSubmit}>
+              {/* Star Rating */}
+              <div className="feedback-stars-label">How would you rate CVCraft?</div>
+              <div className="feedback-stars">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    className={`star-btn ${star <= (hoverRating || feedback.rating) ? 'active' : ''}`}
+                    onMouseEnter={() => setHoverRating(star)}
+                    onMouseLeave={() => setHoverRating(0)}
+                    onClick={() => setFeedback(prev => ({ ...prev, rating: star }))}
+                    aria-label={`Rate ${star} stars`}
+                  >
+                    ★
+                  </button>
+                ))}
+                {(hoverRating || feedback.rating) > 0 && (
+                  <span className="star-label">
+                    {['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent!'][hoverRating || feedback.rating]}
+                  </span>
+                )}
+              </div>
+
+              <div className="feedback-fields">
+                <input
+                  className="feedback-input"
+                  type="text"
+                  placeholder="Your name"
+                  value={feedback.name}
+                  onChange={e => setFeedback(prev => ({ ...prev, name: e.target.value }))}
+                  required
+                  maxLength={80}
+                />
+                <textarea
+                  className="feedback-input feedback-textarea"
+                  placeholder="Tell us what you think... (max 500 characters)"
+                  value={feedback.message}
+                  onChange={e => setFeedback(prev => ({ ...prev, message: e.target.value }))}
+                  required
+                  maxLength={500}
+                  rows={4}
+                />
+              </div>
+
+              {submitState === 'error' && (
+                <div className="feedback-error">{submitMsg}</div>
+              )}
+
+              <button
+                className="btn btn-primary feedback-submit"
+                type="submit"
+                disabled={submitState === 'loading'}
+              >
+                {submitState === 'loading' ? 'Submitting...' : 'Submit Feedback'}
+              </button>
+            </form>
+          )}
         </div>
       </section>
 
