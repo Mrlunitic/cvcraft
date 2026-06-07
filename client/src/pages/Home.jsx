@@ -199,6 +199,12 @@ export default function Home() {
         </div>
         <div className="footer-bottom">
           <p>© {new Date().getFullYear()} CVCraft. All rights reserved.</p>
+          <p className="footer-credit">
+            Built with ❤️ by{' '}
+            <a href="https://krijanraigai.com.np/" target="_blank" rel="noopener noreferrer">
+              Krijan Raigai
+            </a>
+          </p>
         </div>
       </footer>
 
