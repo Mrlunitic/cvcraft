@@ -6,7 +6,8 @@ import authRoutes from './routes/auth.js';
 import cvRoutes from './routes/cvs.js';
 import feedbackRoutes from './routes/feedback.js';
 
-dotenv.config();
+// Load .env for local dev; on Vercel, env vars are set via dashboard
+dotenv.config({ quiet: true });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
