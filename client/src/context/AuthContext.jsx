@@ -91,11 +91,12 @@ export const AuthProvider = ({ children }) => {
       await loadUser();
       return { success: true };
     } catch (err) {
+      const errorMsg = err.response?.data?.message || (err.message === 'Network Error' ? 'Network Error: Cannot connect to server' : 'Login failed');
       dispatch({
         type: 'AUTH_ERROR',
-        payload: err.response?.data?.message || 'Login failed'
+        payload: errorMsg
       });
-      return { success: false, error: err.response?.data?.message };
+      return { success: false, error: errorMsg };
     }
   };
 
@@ -109,11 +110,12 @@ export const AuthProvider = ({ children }) => {
       await loadUser();
       return { success: true };
     } catch (err) {
+      const errorMsg = err.response?.data?.message || (err.message === 'Network Error' ? 'Network Error: Cannot connect to server' : 'Registration failed');
       dispatch({
         type: 'AUTH_ERROR',
-        payload: err.response?.data?.message || 'Registration failed'
+        payload: errorMsg
       });
-      return { success: false, error: err.response?.data?.message };
+      return { success: false, error: errorMsg };
     }
   };
 
